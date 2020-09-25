@@ -15,6 +15,9 @@
     .out{
         color:red;
     }
+    i{
+        color:#ebebeb;
+    }
 </style>
 <script>
     document.addEventListener("DOMContentLoaded",()=>{
@@ -168,6 +171,7 @@
 </script>
 <body>
     <p>No Stylesheet developed by <a target="_blank" href="https://www.github.com/suthiphong">@JingJo.MUT</a></p>
+    <a href="#">CCP1.txt</a>
     <p>Example : frequency : 70kHz, Duty : 10%, Cytal: 10MHz</p>
     <table>
         <tr>
@@ -225,6 +229,8 @@
             </tr>
         </table>
     </div>
+    <p><i>มีเรือลำนึงลอยใต้น้ำมา...</i></p>
+    <label><u>ก่อนสอบจะปิดเว็บนี้</u></label>
 
 </body>
 </html>
