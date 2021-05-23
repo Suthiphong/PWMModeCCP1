@@ -29,6 +29,10 @@
         var lfreq = document.getElementById("label_freq")
         var lduty = document.getElementById("label_Duty")
         var lcyt = document.getElementById("label_Cytal")
+        var total_obj = {
+            ccp1con:'',
+            ccp1l:'',
+        }
         
 
 
@@ -50,7 +54,8 @@
         }
 
         const TimePrescaler = (f) => {
-            f = f / 1000
+            /*f = f / 1000
+
 
             if(f>=1.22 && f<4.88){
                 return 16
@@ -62,7 +67,8 @@
                 return 1
             }else {
                 return 1
-            }
+            }*/
+            return 16
             
 
         }
@@ -72,23 +78,27 @@
         }
 
         const PR2 = (t,tosc,timescaler) => {
-            let res = t/(4 * tosc *timescaler)
-            return Math.floor(res)
+            let res = (t/(4 * tosc *timescaler) ) - 1
+            return Math.round(res)
         }
 
         const CCP1CON54 = (ton, tosc, timescaler) => {
             let res = ton / (tosc * timescaler)
-            res = Math.floor(res)
-            console.log(res)
+            res = Math.round(res)
+           
             let binRes = res.toString(2).split("")
             let len = binRes.length
+            
 
             for(let i=len;i<10;i++){
                 binRes.unshift('0')
                 
             }
+
             let fiveFour = `${binRes[8]}${binRes[9]}`
             let CCP1CON = binRes.slice(0, 8)
+            total_obj.ccp1l = CCP1CON.join("")
+            
             CCP1CON = parseInt(CCP1CON.join(""),2).toString(16)
 
             if(CCP1CON.length < 2){
@@ -105,7 +115,8 @@
             let buffer = ['0','0','1','1','0','0']
             ff = ff.split("")
             buffer.splice(2,0,ff[0],ff[1])
-            console.log(buffer)
+           //console.log(`ccp1CON ${buffer}`)
+           total_obj.ccp1con = buffer.join("")
             buffer = parseInt(buffer.join(""),2).toString(16)
             if(buffer.length < 2){
                 buffer =  `0${buffer}`
@@ -116,7 +127,8 @@
 
         const T2CON = (timeScaler) => {
             let buffer = ['0','0','0','0','0','1']
-            timeScaler = parseInt(timeScaler)
+            //timeScaler = parseInt(timeScaler)
+            timeScaler = 16
             if(timeScaler == 1){
                 buffer.splice(buffer.length, 0, '0','0')
             }else if(timeScaler == 4){
@@ -128,11 +140,13 @@
             if(buffer.length < 2){
                 buffer =  `0${buffer}`
             }
-            return `0x${buffer}`
+            console.log(buffer)
+            //return `0x${buffer}`
+            return '0x02';
         }
 
         const cale = () => {
-            var _freq = parseFloat(freq.value) * 1000
+            var _freq = parseFloat(freq.value)
             var _duty = parseFloat(duty.value)
             var _cyt = parseFloat(cyt.value) * 1000000
             let T = findT(_freq)
@@ -150,13 +164,20 @@
 
             document.getElementById("pr2").innerHTML = _PR2;
             document.getElementById("ccpr1l").innerHTML = _CCP1CON54.ccpr1l;
-            document.getElementById("ccp1con").innerHTML = _CCP1CON;
-            document.getElementById("t2con").innerHTML = _T2CON;
+            document.getElementById("ccp1con").innerHTML = `${_CCP1CON} 0b${total_obj.ccp1con}`;
+            document.getElementById("t2con").innerHTML = `${_T2CON} 0b00000010`;
 
             document.getElementById("T").innerHTML = T;
             document.getElementById("Ton").innerHTML = Ton;
             document.getElementById("Tosc").innerHTML = _Tosc;
             document.getElementById("Tmp").innerHTML = TimePres;
+
+
+            document.getElementById("t2con_label").innerHTML = '0B00000010'
+            document.getElementById("ccp1").innerHTML = `0B${total_obj.ccp1con}`
+            document.getElementById("ccpr1l_label").innerHTML = `0B${total_obj.ccp1l}`
+            document.getElementById("pr2_label").innerHTML = `${_PR2}`
+            
             
         }
 
@@ -175,15 +196,15 @@
     <p>Example : frequency : 70kHz, Duty : 10%, Cytal: 10MHz</p>
     <table>
         <tr>
-            <td>frequency(kHz): </td>
+            <td>frequency(Hz): </td>
             <td>Duty(%) : </td>
             <td>Cytal (Mhz) : </td>
             <td></td>
         </tr>
         <tr>
-            <td><input type="text" placeholder="70" id="freq" value="70"></td>
-            <td><input type="text" placeholder="10" id="duty" value="10"></td>
-            <td><input type="text" placeholder="10" id="cyt" value="10"></td>
+            <td><input type="text" placeholder="70" id="freq" value="500"></td>
+            <td><input type="text" placeholder="10" id="duty" value="25"></td>
+            <td><input type="text" placeholder="10" id="cyt" value="4"></td>
             <td><button id="btn_cal">Cal</button></td>
         </tr>
     </table>
@@ -229,8 +250,18 @@
             </tr>
         </table>
     </div>
+    <div style="white-space: pre-wrap;border-style:solid;width:500px;background-color:aliceblue;">
+            void main{
+                T2CON       = <label id="t2con_label"></label>;
+                CCP1CON     = <label id="ccp1"></label>;
+                CCPR1L      = <label id="ccpr1l_label"></label>;
+                PR2      = <label id="pr2_label"></label>;
+                T2CON.F2    = 1;
+                TRISC       = 0x00;
+            }
+        
+    </div>
     <p><i>มีเรือลำนึงลอยใต้น้ำมา...</i></p>
-    <label><u>ก่อนสอบจะปิดเว็บนี้</u></label>
 
 </body>
 </html>
